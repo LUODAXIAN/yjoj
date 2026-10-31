@@ -1,0 +1,64 @@
+spring:
+  # Springfox 使用旧版路径匹配器。
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  application:
+    name: yjoj-backend-question-service
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3308}/${MYSQL_DATABASE:yjoj}?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:123456}
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6380}
+    database: ${REDIS_DATABASE:1}
+    password: ${REDIS_PASSWORD:}
+    timeout: 5s
+  session:
+    store-type: redis
+    timeout: 30d
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER_ADDR:localhost:8848}
+        username: ${NACOS_USERNAME:nacos}
+        password: ${NACOS_PASSWORD:nacos}
+
+server:
+  port: 8103
+  servlet:
+    context-path: /api/question
+    session:
+      cookie:
+        name: YJOJSESSION
+        path: /api
+        max-age: 2592000
+        same-site: lax
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: false
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: isDelete
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+knife4j:
+  enable: true
+
+yjoj:
+  judge:
+    confirm-timeout-ms: ${JUDGE_CONFIRM_TIMEOUT_MS:5000}

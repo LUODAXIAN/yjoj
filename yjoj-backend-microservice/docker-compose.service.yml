@@ -1,0 +1,86 @@
+services:
+  yjoj-code-sandbox:
+    container_name: yjoj-code-sandbox
+    build:
+      context: ../yjoj-code-sandbox
+    environment:
+      SANDBOX_TYPE: native
+      SANDBOX_AUTH_SECRET: ${CODE_SANDBOX_AUTH_SECRET:-change-me}
+    ports:
+      - "8090:8090"
+    networks: [yjoj-network]
+
+  yjoj-backend-gateway:
+    container_name: yjoj-backend-gateway
+    build: ./yjoj-backend-gateway
+    environment:
+      NACOS_SERVER_ADDR: yjoj-nacos:8848
+    ports:
+      - "8101:8101"
+    depends_on:
+      nacos:
+        condition: service_started
+    networks: [yjoj-network]
+
+  yjoj-backend-user-service:
+    container_name: yjoj-backend-user-service
+    build: ./yjoj-backend-user-service
+    environment: &service-environment
+      MYSQL_HOST: yjoj-mysql
+      MYSQL_PORT: 3306
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-123456}
+      REDIS_HOST: yjoj-redis
+      REDIS_PORT: 6379
+      RABBITMQ_HOST: yjoj-rabbitmq
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      NACOS_SERVER_ADDR: yjoj-nacos:8848
+    ports:
+      - "8102:8102"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nacos:
+        condition: service_started
+    networks: [yjoj-network]
+
+  yjoj-backend-question-service:
+    container_name: yjoj-backend-question-service
+    build: ./yjoj-backend-question-service
+    environment: *service-environment
+    ports:
+      - "8103:8103"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      nacos:
+        condition: service_started
+    networks: [yjoj-network]
+
+  yjoj-backend-judge-service:
+    container_name: yjoj-backend-judge-service
+    build: ./yjoj-backend-judge-service
+    environment:
+      <<: *service-environment
+      CODE_SANDBOX_URL: http://yjoj-code-sandbox:8090
+      CODE_SANDBOX_AUTH_SECRET: ${CODE_SANDBOX_AUTH_SECRET:-change-me}
+    ports:
+      - "8104:8104"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      nacos:
+        condition: service_started
+      yjoj-code-sandbox:
+        condition: service_started
+    networks: [yjoj-network]
+
+networks:
+  yjoj-network:
+    name: yjoj-network

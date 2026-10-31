@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: yjoj-backend-gateway
+  main:
+    web-application-type: reactive
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER_ADDR:localhost:8848}
+        username: ${NACOS_USERNAME:nacos}
+        password: ${NACOS_PASSWORD:nacos}
+    gateway:
+      routes:
+        - id: yjoj-backend-user-service
+          uri: lb://yjoj-backend-user-service
+          predicates:
+            - Path=/api/user/**
+        - id: yjoj-backend-question-service
+          uri: lb://yjoj-backend-question-service
+          predicates:
+            - Path=/api/question/**
+        - id: yjoj-backend-judge-service
+          uri: lb://yjoj-backend-judge-service
+          predicates:
+            - Path=/api/judge/**
+
+server:
+  port: 8101
+
+knife4j:
+  gateway:
+    enabled: true
+    strategy: discover
+    discover:
+      enabled: true
+      version: swagger2
+      excluded-services:
+        - yjoj-backend-gateway
+
+# 三类保护相互独立；关闭此开关仅取消新增限流，内部接口拦截仍生效。
+yjoj:
+  protection:
+    gateway-flow-enabled: ${GATEWAY_FLOW_ENABLED:true}
+    login-qps: ${GATEWAY_LOGIN_QPS:2}
+    register-per-minute: ${GATEWAY_REGISTER_PER_MINUTE:5}
+    query-qps: ${GATEWAY_QUERY_QPS:20}
+    submit-qps: ${GATEWAY_SUBMIT_QPS:2}

@@ -1,0 +1,10 @@
+server:
+  port: 8090
+
+sandbox:
+  type: ${SANDBOX_TYPE:docker}
+  auth-header: ${SANDBOX_AUTH_HEADER:auth}
+  auth-secret: ${SANDBOX_AUTH_SECRET:change-me}
+  timeout-ms: ${SANDBOX_TIMEOUT_MS:5000}
+  docker:
+    image: ${SANDBOX_DOCKER_IMAGE:eclipse-temurin:8-jre-alpine}

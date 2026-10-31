@@ -1,0 +1,6 @@
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+knife4j:
+  production: true
+

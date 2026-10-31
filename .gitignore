@@ -1,0 +1,15 @@
+﻿**/target/
+**/build/
+**/.idea/
+**/.vscode/
+**/node_modules/
+**/logs/
+**/tmpCode/
+*.iml
+*.iws
+*.ipr
+*.class
+*.log
+.env
+.env.*
+!.env.example

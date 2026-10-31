@@ -1,0 +1,55 @@
+spring:
+  # Springfox 使用旧版路径匹配器。
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  application:
+    name: yjoj-backend-judge-service
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
+    listener:
+      simple:
+        acknowledge-mode: manual
+        default-requeue-rejected: false
+        prefetch: 1
+        concurrency: ${JUDGE_CONCURRENCY:1}
+        max-concurrency: ${JUDGE_CONCURRENCY:1}
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER_ADDR:localhost:8848}
+        username: ${NACOS_USERNAME:nacos}
+        password: ${NACOS_PASSWORD:nacos}
+
+server:
+  port: 8104
+  servlet:
+    context-path: /api/judge
+
+codesandbox:
+  url: ${CODE_SANDBOX_URL:http://localhost:8090}
+  auth-header: ${CODE_SANDBOX_AUTH_HEADER:auth}
+  auth-secret: ${CODE_SANDBOX_AUTH_SECRET:change-me}
+
+knife4j:
+  enable: true
+
+yjoj:
+  protection:
+    sandbox-circuit-enabled: ${SANDBOX_CIRCUIT_ENABLED:true}
+    circuit-window-ms: 10000
+    circuit-min-requests: 5
+    circuit-error-ratio: 0.5
+    circuit-open-seconds: 10
+  judge:
+    retry:
+      enabled: ${JUDGE_RETRY_ENABLED:true}
+      max-retries: ${JUDGE_MAX_RETRIES:3}
+      confirm-timeout-ms: ${JUDGE_CONFIRM_TIMEOUT_MS:5000}
